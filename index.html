@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<html>
+<body>
+<h1 id="welcome">Malaria data from https://data.unicef.org/resources/dataset/malaria/</h1>
+
+<input id="theInput" type="text" />
+
+<script>
+
+var margin = ({top: 50, left: 50, right: 50, bottom: 50});
+var barwindow = ({width: 800, height: 400});
+var year=2016;
+var metric="ufive8";
+var cdisp=["Nigeria", "Democratic Republic of the Congo", "Mali", "Burkina Faso", "Niger"];
+
+d3.csv("MalariaData.csv" , function(error, data) {
+  console.log(data);
+  data.forEach(function(d) {
+    d.year = +d.year;
+    d.ufive8 = +d.ufive8;
+    d.rufive8= +d.rufive8;
+    d.fufive8= +d.fufive8;
+     
+  }); 
+  //sets up the axes
+  var barChart = d3.select("body").append('svg')
+    .attr("width", barwindow.width)
+    .attr("height", barwindow.height)
+    .attr("x", margin.left)
+    .attr("y", margin.top);
+  var xAxisScale=d3.scaleBand()
+    .domain(function(d){if (d.year== year) {return d.country} })
+    .range(barwindow.width);
+    
+  var xAx=d3.axisBottom()
+    .tickSize(0)
+    .scale(xAxisScale);
+  var yAxisScale=d3.scaleLinear()
+    .domain(function(d){if (d.year== year) {return d.ufive8} })
+    .range([0,barwindow.height]);
+  var yAx=d3.axisLeft()
+    .scale(yAxisScale);
+  
+  xGroup = barChart.append('g')
+    .attr("transform", `translate(${margin.left},${400 - margin.bottom})`)
+    .call(xAx);
+  yGroup = barChart.append('g')
+    .attr( "transform", `translate(${margin.left},${margin.top})`)
+    .call(yAx);
+  xGroup.selectAll("text").remove();
+  yGroup.selectAll("text").remove();
+
+  barChart.selectAll("rect")
+    .data(d)
+    .enter().append("rect")
+    .attr("x", function(d,i){return (xAxisScale(d)/11)+margin.left+10;})
+    .attr("y", function(d, i){return 350-d;})
+    .attr("height", function(d) {return d;})
+    .attr("width", bwidth);
+});
+</script>
+</body>
+</html>
